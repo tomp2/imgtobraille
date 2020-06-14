@@ -1,7 +1,9 @@
 name: imgtobraille
 dependencies:
-  - python=3.8
-  - Cython==0.29.*
-  - natsort=7.0.*
-  - opencv=4.2.0.*
-  - tqdm=4.46.*
+  - python=3.8.2
+  - opencv=4.2.0
+  - natsort=7.0.1
+  - tqdm=4.46.0
+  - Cython=0.29.17
+  - pip:
+    - truecolor=1.0b2

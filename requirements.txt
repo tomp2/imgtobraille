@@ -1,0 +1,7 @@
+natsort==7.0.1
+tqdm==4.46.0
+cython==0.29.19
+truecolor==1.0b2
+setuptools==46.4.0
+opencv-python==4.2.0.34
+numpy==1.18.4

@@ -1,179 +1,214 @@
+"""Main program."""
 import argparse
 import errno
 import os
+import sys
 import time
 
 import cv2
 import natsort
+import numpy as np
 import tqdm
 
-import program.cython_module as cy
-
-# Todo:
-#   merge threshold with curves?
-#   colors with ANSI escape?
-
-INFO = "[\u001b[32mi\u001b[0m]"
-WARNING = "[\u001b[33m!\u001b[0m]"
-ERROR = "[\u001b[31m#\u001b[0m]"
+from source import dithering
+from source import brailleforming
+from source.visual import good, bad, info, silent
 
 
-def initialize_args():
-    """Initializes commandline arguments"""
-
+def initialize_args() -> argparse.Namespace:
+    """Initialize commandline arguments."""
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "PATH",
-        action="store",
-        metavar="path",
-        help="Input path (file/dir)")
+        'PATH',
+        action='store',
+        metavar='path',
+        help='Input path (file/dir)',
+    )
     parser.add_argument(
-        "-w",
-        action="store",
-        metavar="width",
+        '-w',
+        action='store',
+        metavar='width',
         default=100,
         type=int,
-        help="Width of braille output in characters")
+        help='Width of print in characters',
+    )
     parser.add_argument(
-        "-t",
-        action="store",
-        metavar="time",
-        default=0.1,
+        '-d',
+        action='store',
+        metavar='dithering',
+        default=2,
+        type=int,
+        help='1=threshold, 2=Floyd–Steinberg, 3=random, 4=none',
+    )
+    parser.add_argument(
+        '-t',
+        action='store',
+        metavar='time',
+        default=0.05,
         type=float,
-        help="Frame time in seconds")
-    arguments = parser.parse_args()
-    return arguments
-
-
-def scale_image(image, new_width, old_width):
-    """
-    Scales an image to fit the given width
-    :param image: numpy.ndarray
-    :param new_width: int
-    :param old_width: int
-    :return: numpy.ndarray
-    """
-    scaling_factor = new_width / old_width  # Scale image to match given width
-    image_resized = cv2.resize(                   # 2 comes from braille char width
-        src=image,
-        dsize=None,
-        fx=scaling_factor,
-        fy=scaling_factor,
-        interpolation=cv2.INTER_AREA
+        help='Frame time in seconds',
     )
-    return image_resized
-
-
-def get_image_size(image):
-    """
-    Returns the resolution of the image given
-    :param image: numpy.ndarray
-    :return: tuple
-    """
-    # check: return type
-    return image.shape[:2]
-
-
-def threshold(image):
-    """
-    Uses OpenCV adaptiveThreshold to create an 1/0 image for the on/off-status
-    for the braille dot statuses to be read from.
-    Alternative to "image_filter_noise". The output is the image from  which
-    the on/off-status for the braille dots is read.
-    :param image: numpy.ndarray
-    :return: numpy.ndarray
-    """
-    image_blurred = cv2.medianBlur(image, 5)
-    image = cv2.adaptiveThreshold(
-        src=image_blurred,
-        maxValue=255,
-        adaptiveMethod=cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-        thresholdType=cv2.THRESH_BINARY,
-        blockSize=11,
-        C=2
+    parser.add_argument(
+        '-s',
+        action='store_true',
+        default=False,
+        help='Silent',
     )
-    return image
+    return parser.parse_args()
 
 
-def get_input_paths(path):
-    """
-    Determines whether input path points to an image or a directory.
-    Then returns list with the image/images.
-    :param path: str
-    :return: list
-    :return: list
-    """
-    input_path = os.path.abspath(path)
-
-    if not os.path.exists(input_path):
-        print(f"{ERROR} Invalid path!")
-        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), input_path)
-    if os.path.isfile(input_path):
-        image_paths = [input_path]
-    else:
-        paths = [os.path.join(input_path, file) for file in os.listdir(input_path)]
-        image_paths = natsort.natsorted(paths)
-    return image_paths
-
-
-def process_frame(path, new_width, new_height, old_width):
-    """
-    Forms the final braille "image" as a string.
-    :param path: str
-    :param new_width: int
-    :param new_height: int
-    :param old_width: int
-    :return: str
-    """
-    image_original = cv2.imread(path, 0)
-    image_scaled = scale_image(image_original, new_width, old_width)
-    image_filtered = cy.curves(new_height, new_width, image_scaled)
-
-    frame = []
-    convert = cy.convert_to_braille
-    grid = cy.braille_grid(new_height, new_width)
-    for row in grid:
-        row_characters = [convert(block, image_filtered) for block in row]
-        frame.append(''.join(row_characters) + '\n')
-    return ''.join(frame)
-
-
-def preview(image):
-    """
-    Previes image
-    :param image: numpy.ndarray
-    :return: none
-    """
-    cv2.imshow('Image preview', image)
+def preview_ndarray(img: np.ndarray) -> None:
+    """Preview image."""
+    cv2.imshow('Image preview_ndarray', img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
 
+def save_frames_txt(frames: list, separator: str = '\n\n') -> None:
+    """Save converted frames to a text file."""
+    with open('frames', 'w') as save_file:
+        save_file.write(separator.join(frames))
+
+
+def get_input_paths(path: str) -> list:
+    """Get list of paths for the images."""
+
+    input_path = os.path.abspath(path)
+    if not os.path.exists(input_path):
+        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), input_path)
+    if os.path.isfile(input_path):
+        img_paths = [input_path]
+    else:
+        paths = [os.path.join(input_path, path) for path in os.listdir(input_path)]
+        img_paths = natsort.natsorted(paths)
+
+    return img_paths
+
+
+class Scaling:
+    """Handles the part where image files are relevant. """
+
+    def __init__(self, paths: list, target_width: int) -> None:
+        """Get old and new resolutions to use in scaling and looping."""
+        self.paths = paths
+        self.target_width = target_width
+
+        img_unscaled = cv2.imread(self.paths[0], 0)
+        self.unscaled_res = img_unscaled.shape[:2]
+
+    def scale_img(self, path: str) -> np.ndarray:
+        """Scale an image to fit the given width."""
+        img = cv2.imread(path, 0)
+        scaling_factor = self.target_width / self.unscaled_res[1]
+
+        return cv2.resize(
+            src=img,
+            dsize=None,
+            fx=scaling_factor,
+            fy=scaling_factor,
+            interpolation=cv2.INTER_AREA,
+        )
+
+    def get_scaled(self) -> list:
+        """Return all images scaled."""
+
+        return [
+            self.scale_img(img) for img in tqdm.tqdm(
+                self.paths,
+                unit=' f',
+                disable='-s' in sys.argv,
+                ascii=True,
+            )
+        ]
+
+
+class Converting:
+    """Do dithering and conversion to output string."""
+
+    def __init__(self, images: list, method: int) -> None:
+        """Subdivide canvas and fit resolution for it."""
+        self.images = images
+        self.method = method
+
+        # Update res to allow dithering to function better near the borders
+        # In the end the image will have these proportions
+        height, width = images[0].shape[:2]
+        while width % 2 != 0:
+            width -= 1
+        while height % 4 != 0:
+            height -= 1
+        self.scaled_res = (height, width)
+
+        self.grid = brailleforming.subdivide(*self.scaled_res)
+
+    def dithering(self, img: np.ndarray, method: int) -> np.ndarray:
+        """Binarize image using selecting dithering algorithm."""
+        if method == 1:
+            dithered = dithering.threshold(*self.scaled_res, img)
+        elif method == 2:
+            dithered = dithering.quantize(*self.scaled_res, img)
+        elif method == 3:
+            dithered = dithering.random(*self.scaled_res, img)
+        else:
+            return img
+
+        return dithered
+
+    def process_frame(self, img: np.ndarray) -> str:
+        """Turn the image to a string for output."""
+        # Subdivide to rectangles
+        dithered = self.dithering(img, method=self.method)
+        return brailleforming.form_image(self.grid, dithered)
+
+    def get_frames(self) -> list:
+        """Return all processed frames as strings for output."""
+        return [
+            self.process_frame(img) for img in tqdm.tqdm(
+                self.images,
+                unit=' f',
+                disable='-s' in sys.argv,
+                ascii=True,
+            )
+        ]
+
+
 def main():
-    """Main loop"""
+    """Run main loop."""
+    verbose = '-s' not in sys.argv
+    locals()['good'] = good if verbose else silent
+    locals()['bad'] = bad if verbose else silent
+    locals()['info'] = info if verbose else silent
+
     args = initialize_args()
 
-    image_paths = get_input_paths(args.PATH)
-    image_1 = image_paths[0]
-    target_width = args.w * 2
+    print(good('Getting image path(s)'))
+    paths = get_input_paths(args.PATH)
+    print(good(f'Found {len(paths)} images'))
 
-    old_width = get_image_size(cv2.imread(image_1))[1]
-    temp_scaled = scale_image(cv2.imread(image_1, 0), target_width, old_width)
-    new_height, new_width = get_image_size(temp_scaled)
+    scaler = Scaling(paths, args.w)
+    print(good(f'Original width {scaler.unscaled_res[0]} '
+               f'will be scaled to {scaler.target_width}'))
 
-    ready_frames = []
-    for image in tqdm.tqdm(image_paths):
-        new_frame = process_frame(image, new_width, new_height, old_width)
-        ready_frames.append(new_frame)
+    print(good('Scaling images'))
+    scaled_images = scaler.get_scaled()
+
+    converter = Converting(scaled_images, args.d)
+    height, width = scaler.unscaled_res
+    print(good(f'Final res: {width // 2}*{height // 4} characters'))
+
+    ready_frames = converter.get_frames()
+
 
     print(ready_frames[0])
-    if len(ready_frames) > 1:
-        input("Play animation? [Y/n]: ")
+
+    save_frames_txt(ready_frames)
+
+    if len(ready_frames) > 1 and input('Play animation? [Y/n]: ') in 'Yy':
         while True:
             for new_frame in ready_frames:
                 print(new_frame)
                 time.sleep(args.t)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
