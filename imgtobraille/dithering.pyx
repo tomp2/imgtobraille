@@ -23,13 +23,12 @@ cpdef unsigned char[:,:] quantize(int h, int w, unsigned char[:,:] img):
 
     cpdef int x, y, old_pixel, new_pixel
     cpdef double quant_error
+    cpdef int average = np.average(img)
+    cpdef int minval = np.percentile(img, 5)
+    cpdef int maxval = np.percentile(img, 95)
 
-    img = np.pad(img, 1)   # Allows dithering the borders without index error
-    average = np.average(img)
-
-    minval = np.percentile(img, 5)
-    maxval = np.percentile(img, 95)
-    print(average, minval, maxval)
+    # Update res to allow dithering to function better near the borders
+    img = np.pad(img, 1)
 
     for y in range(1, h):
         for x in range(1, w):

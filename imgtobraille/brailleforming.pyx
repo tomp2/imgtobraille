@@ -1,4 +1,4 @@
-"""Cython for performance gains on the one-by-one pixel loops"""
+"""Cython"""
 
 cpdef list subdivide(int new_height, int new_width):
     """
