@@ -1,4 +1,3 @@
-# ImgToBraille
 ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⣿⣿⣿⣿⣿⠿⣫⣿⣳⠣⡻⢾⣻⡻⡫⡪⣏⡶⢘⣻⡉⠖⠜⢓⡡⡡⠐⡎⢨⣩⡠⢂⠐⠄⠙⡀⠀⠄⢀⠁⠡⠡⡀⡁⠀⠄
 ⠸⠿⠿⣿⣿⡿⠿⠿⠀⢸⣿⡇⠀⠀⠀⠀⠀⠀⠛⠃⠀⠀⠀⢀⣀⠀⠀⠀⠀⠀⠀⠀⠘⠛⠀⠀⠀⠀⢀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣶⣿⠀⠀⠀⠀⢀⣀⡀⠀⠀⠀⠀⠀⢀⣀⠀⠀⠀⠀⣶⣿⡄
 ⠀⠀⠀⣿⣿⡇⠀⠀⠀⢸⣿⣿⠿⣿⣿⣦⠀⢼⣿⡇⠀⣶⣿⡛⠻⠿⠧⠀⠀⠀⠀⠀⢸⣿⡧⠀⣴⣿⡛⠛⠿⠧⠀⠀⠀⠀⠀⠠⢿⠿⠛⢻⣿⣆⠀⠀⠀⠀⠀⢿⣿⣿⠿⠂⢠⣾⡿⠛⢿⣿⣦⠀⣼⣿⣟⠻⠿⠦⠀⠿⣿⣿⠿⠇
@@ -6,51 +5,43 @@
 ⠀⠀⠀⣿⣿⡇⠀⠀⠀⢸⣿⣧⠀⢸⣿⢟⠀⢸⡿⡇⠀⠻⢿⣶⣶⣿⠟⠀⠀⠀⠀⠀⢸⣿⢧⠀⠻⢿⣷⣶⣿⠿⠁⠀⠀⠀⠀⠻⣿⣷⡶⠿⣿⡿⠀⠀⠀⠀⠀⠘⢿⣿⣶⡄⠈⠻⢿⣶⣾⡿⠃⠀⠻⢿⣶⣴⣿⠟⠀⠀⢿⣿⣷⡆
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠄⠀⠀⠀⢐⠄⡀⠑⠂⢑⡈⡗⡄⠁⣪⠘⠊⠱⡝⢀⣍⠎⡽⠋⠕⡄⠿⡃⡇⡧⣫⣻⣴⡿⣻⣽⣟⣞⣧⣻⢟⣿⢾⡿⣷⢿⡏⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
 
-Wanted to test some cython and opencv so I did this as a test
+Small project to learn some image processing with cython + OpenCV
 
-[![wemake-python-styleguide](https://img.shields.io/badge/style-wemake-000000.svg)](https://github.com/wemake-services/wemake-python-styleguide)
-
+---
 **Setup:**
 
 ```bash
 git clone https://github.com/Kemaleen/ImgToBraille
 cd ImgToBraille
-```
-
-Using venv:
-
-```bash
 python -m venv env
 source env/bin/activate
 pip install -r requirements.txt
-
-deactivate   <-- exit virtualenv
+```
+_Exit virtualenv with:_
+```
+deactivate
 ```
 
-Using Conda:
-
-```bash
-conda env create -f environment.yml
-conda activate imgtobraille
-```
+---
 
 **Usage:**
 
 ```
-imgtobraille.py [-h] [-w width] [-t time] path
+python imgtobraille [-h] [-w width] [-d dithering] [-t time] path
 
 positional arguments:
-  input          Input path (file/dir)
+  path          Input path (file/dir)
 
 optional arguments:
-  -h, --help     show this help message and exit
-  -w width       Width of braille output in characters
-  -t time        Frame time
+  -h, --help    show this help message and exit
+  -w width      Width of print in characters
+  -d dithering  1=threshold, 2=Floyd–Steinberg, 3=random, 4=none
+  -t time       Frame time in seconds
 ```
 
-Example:
+Examples:
 
 ```
-python imgtobraille.py demos/demo.png -w 100
-python imgtobraille.py demos/cube/ -w 50 -t 0.05
+python imgtobraille demos/demo.png -w 100
+python imgtobraille demos/cube/ -w 50 -t 0.05
 ```

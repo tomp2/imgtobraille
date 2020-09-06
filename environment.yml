@@ -1,8 +1,0 @@
-name: imgtobraille
-dependencies:
-  - natsort
-  - tqdm
-  - pip
-  - python
-  - opencv
-  - cython

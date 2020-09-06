@@ -2,9 +2,9 @@
 
 cpdef list subdivide(int new_height, int new_width):
     """
-    Subdivides image to 2*4 rectangles, and stores the coordinates of the 
-    opposite corners of them. These are used to loop through a specific rectangles
-    points in the image to convert the rectangles values to a braille character
+    Subdivides image to 2*4 rectangles, and stores the coordinates of the opposite corners of them. 
+    These are used to loop through a specific rectangles
+    points in the image to convert the values of the rectangle to a braille character
     """
     cdef int y_cord, x_cord
     cdef list grid
@@ -32,6 +32,7 @@ cpdef unicode form_braille(list block, unsigned char[:,:] image):
     y_block = 0
     x_block = 0
     for y_global in range(y_1, y_2):
+
         for x_global in range(x_1, x_2):
             if image[y_global, x_global]:
                 unicode_sum += values[x_block][y_block]
@@ -42,7 +43,7 @@ cpdef unicode form_braille(list block, unsigned char[:,:] image):
     return chr(unicode_sum)
 
 
-cpdef unicode form_image(list grid, unsigned char[:,:] image):
+cpdef unicode form_string(list grid, unsigned char[:,:] image):
     """Forms the final string by looping through the rectangles by rows."""
 
     cpdef list frame = []
@@ -56,4 +57,5 @@ cpdef unicode form_image(list grid, unsigned char[:,:] image):
         for block in row:
             string_append(convert(block, image))
         frame_append("".join(string))
+
     return '\n'.join(frame)

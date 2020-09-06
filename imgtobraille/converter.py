@@ -1,104 +1,64 @@
-import os
-from typing import Iterable, List
-
 import cv2
 import numpy as np
 
-from imgtobraille import brailleforming
-from imgtobraille import dithering
-from imgtobraille import iutils
+import brailleforming
+import dithering
 
 
-class Braille:  # Todo: add image editing values
-    def __init__(self, source: str, width: int = 0, method: int = 2, **kwargs):
-        self.source = source
-        self.args = kwargs
-        self.method = method
+class Braille:
+    """Class to store the data of of original & converted images"""
 
-        unscaled = read_img(self.source)[0]
-        self.array = scale(unscaled, width)[0]
-        # res = (old x, new y, new x)
-        height, width = self.array.shape[0], width
+    def __init__(self, source: str, width: int, method: int):
+        self.path = source
+        self.original = read_img_file(self.path)
+        self.scaled = scale(self.original, width)
+
+        height, width = self.scaled.shape[:2]
         while width % 2 != 0:
             width -= 1
         while height % 4 != 0:
             height -= 1
-        self.res = (height, width, *unscaled.shape)
+        self.res = (height, width, *self.original.shape)
+        self.scaled = self.scaled[0:height, 0:width]
 
-        self.frame = self.convert()
-
-    def __str__(self):
-        return self.frame
-
-    def convert(self) -> str:
-        """Do the conversion from image to unicode string"""
-
-        # Check:
-        # As the fix for the resolution fitting for the rectangles is not used
-        # before scaling, and only for the resolution used for operations for
-        # the now (by resolution possibly different (bigger)) image, there may
-        # have been happened unneeded dithering for the pixels that were left
-        # remaining due to the fix happening only afterwards
-
-        grid = brailleforming.subdivide(*self.res[0:2])
-        dithered = np.asarray(dither(self.array, self.method))
-        self.frame = brailleforming.form_image(grid, dithered)
-        return self.frame
+        self.frame = convert(self.scaled, method)
 
 
-def read_img(source: Iterable[str]) -> List[np.ndarray]:
-    """
-    Convert source to numpy array
-    :param source: path(s) or url(s) to images. Can be mixed.
-    """
+def convert(array, method) -> str:
+    """Do the conversion from image to unicode string"""
 
-    def read_using(image: str):
-        if os.path.exists(image):
-            img = cv2.imread(source, 0)
-        else:
-            img = iutils.url_to_image(image)[0]
-        return img
-
-    sources = iutils.assure_iterable(source)
-
-    arrays = [read_using(img) for img in sources]
-    return arrays
+    mat = np.asarray(array)
+    dithered_mat = dither(mat, method)
+    frame = to_string(dithered_mat)
+    return frame
 
 
-def scale(target, width=None):
+def read_img_file(source: str) -> np.ndarray:
+    """Read image using open cv and return as NumPy array"""
+
+    return cv2.imread(source, 0)
+
+
+def scale(img, new_width):
     """Scale an image to fit the given width."""
-    images = iutils.assure_iterable(target)
-    if not width:
-        return images
 
-    def do(image):  # Todo: refactor
-        if isinstance(image, Braille):  # For Braille object:
-            img = image.array
-            original_width = image.res[0]
-        else:                           # For np.ndarray
-            original_width = image.shape[1]
-            img = image
+    original_width = img.shape[1]
 
-        scaling_factor = width / original_width
-        scaled_img = cv2.resize(
-            src=img,
-            dsize=None,
-            fx=scaling_factor,
-            fy=scaling_factor,
-            interpolation=cv2.INTER_AREA,
-        )
-        return scaled_img
-
-    return [do(image) for image in images]
+    scaling_factor = new_width / original_width
+    scaled_img = cv2.resize(
+        src=img,
+        dsize=None,
+        fx=scaling_factor,
+        fy=scaling_factor,
+        interpolation=cv2.INTER_AREA,
+    )
+    return scaled_img
 
 
-def dither(img: np.ndarray, method: int) -> np.ndarray:
-    """Binarize image using selecting dithering algorithm."""
+def dither(img: np.ndarray, method: int = 0) -> np.ndarray:
+    """Binarize image using dithering algorithm if method > 0."""
 
-    # Assure that characters fit to image perfectly
-    height, width = img.shape[:2]
-    res = (height, width)
-
+    res = img.shape[:2]
     if method == 1:
         dithered = dithering.threshold(*res, img)
     elif method == 2:
@@ -111,9 +71,13 @@ def dither(img: np.ndarray, method: int) -> np.ndarray:
     return dithered
 
 
-def save():
-    pass
+def to_string(array: np.ndarray):
+    """
+    Convert a NumPy array to the actual image using the boolean statuses
+    from the array.
+    """
 
-
-def preview():
-    pass
+    res = array.shape[:2]
+    grid = brailleforming.subdivide(*res)
+    frame = brailleforming.form_string(grid, array)
+    return frame

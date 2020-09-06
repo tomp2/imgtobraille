@@ -1,15 +1,21 @@
-"""Main program."""
+"""CLI Program"""
+
 import argparse
-import sys
+import errno
+import os
 import time
+from typing import Optional, Sequence
 
-import tqdm
-from imgtobraille import iutils
-from imgtobraille.converter import Braille
+import natsort
+
+import converter
 
 
-def initialize_args(args) -> argparse.Namespace:
-    """Initialize commandline arguments."""
+def initialize_args(*args: Optional[Sequence[str]]) -> argparse.Namespace:
+    """
+    Initialize commandline arguments.
+    :param args: args to pass to parser. Overrides cli arguments
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument(
         'PATH',
@@ -41,54 +47,42 @@ def initialize_args(args) -> argparse.Namespace:
         type=float,
         help='Frame time in seconds',
     )
-    parser.add_argument(
-        '-s',
-        action='store_true',
-        default=False,
-        help='Silent',
-    )
-    return parser.parse_args(args)
+    return parser.parse_args([*args]) if args else parser.parse_args()
+
+
+def get_paths(path: str) -> list:
+    """
+    Get the path to a single image, or all the paths to all image files inside a folder.
+    Finally, return a list with the paths.
+    """
+
+    input_path = os.path.abspath(path)
+    if not os.path.exists(input_path):
+        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), input_path)
+    if os.path.isfile(input_path):
+        img_paths = [input_path]
+    else:
+        paths = [os.path.join(input_path, path) for path in os.listdir(input_path)]
+        img_paths = natsort.natsorted(paths)
+
+    return img_paths
 
 
 def main():
     """Run main loop."""
+    args = initialize_args()
 
-    def good(string):
-        """Returns green sign with '+' """
-        return f'\033[{32}m{"[+] "}\033[0m{string}'
+    paths = get_paths(args.PATH)
 
-    def bad(string):
-        """Returns red sign with '-' """
-        return f'\033[{31}m{"[-] "}\033[0m{string}'
+    brailles = [converter.Braille(path, width=args.w, method=args.d) for path in paths]
 
-    def info(string):
-        """Returns yellow sign with '!' """
-        return f'\033[{33}m{"[!] "}\033[0m{string}'
-
-    verbose = '-s' not in sys.argv
-    locals()['good'] = good if verbose else lambda string: None
-    locals()['bad'] = bad if verbose else lambda string: None
-    locals()['info'] = info if verbose else lambda string: None
-
-    args = initialize_args(["/home/kemali2/Pycharm/1-Projects/ImgToBraille/demos/1.jpg"])
-
-    print(good('Getting image path(s)'))
-    paths = iutils.get_paths(args.PATH)
-    print(good(f'Found {len(paths)} images'))
-
-    brailles = [Braille(path, width=args.w, method=args.d) for path in tqdm.tqdm(
-        paths,
-        unit=' f',
-        disable='-s' in sys.argv,
-        ascii=True,
-    )]
-
-    print(brailles[0])
     if len(brailles) > 1 and input('Play animation? [Y/n]: ') in 'Yy':
         while True:
-            for new_frame in brailles:
-                print(new_frame)
+            for braille in brailles:
+                print(braille.frame)
                 time.sleep(args.t)
+    else:
+        print(brailles[0].frame)
 
 
 if __name__ == '__main__':
