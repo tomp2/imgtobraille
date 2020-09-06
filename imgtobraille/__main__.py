@@ -74,7 +74,7 @@ def main():
 
     paths = get_paths(args.PATH)
 
-    brailles = [converter.Braille(path, width=args.w, method=args.d) for path in paths]
+    brailles = [converter.Braille(path, width=args.w * 2, method=args.d) for path in paths]
 
     if len(brailles) > 1 and input('Play animation? [Y/n]: ') in 'Yy':
         while True:
