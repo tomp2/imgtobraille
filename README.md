@@ -1,25 +1,28 @@
-⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⣿⣿⣿⣿⣿⠿⣫⣿⣳⠣⡻⢾⣻⡻⡫⡪⣏⡶⢘⣻⡉⠖⠜⢓⡡⡡⠐⡎⢨⣩⡠⢂⠐⠄⠙⡀⠀⠄⢀⠁⠡⠡⡀⡁⠀⠄
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣶⣶⣶⣶⣶⣶⣶⣤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⡇⠀⠀⠈⠹⣿⣷⡀⠀⠀⢀⣠⣤⣄⣀⠀⠀⠀⣀⣀⢀⣠⣤⣄⡀⢀⣠⣤⣀⠀⠀⠀⠀⣀⣠⣤⣤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⡇⠀⠀⠀⠀⢻⣿⡇⠀⣴⣿⠟⠋⠛⣿⣷⡀⠀⣿⣿⡟⠛⠻⣿⣿⠟⠛⢻⣿⣧⠀⠀⣾⣿⠟⠛⠛⣿⣷⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⡇⠀⠀⠀⠀⣾⣿⡇⠀⣿⣿⣶⣶⣶⣾⣿⡇⠀⣿⣿⠀⠀⠀⣿⣿⠀⠀⠀⣿⣿⠀⢸⣿⡏⠀⠀⠀⢸⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣇⣀⣀⣀⣴⣿⡿⠀⠀⣿⣿⡀⠀⠀⣀⣀⠀⠀⣿⣿⠀⠀⠀⣿⣿⠀⠀⠀⣿⣿⠀⠸⣿⣷⡀⠀⠀⣼⣿⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠿⠿⠿⠿⠿⠿⠿⠋⠀⠀⠀⠘⠻⢿⣶⣿⠿⠋⠀⠀⠿⠿⠀⠀⠀⠿⠿⠀⠀⠀⠿⠿⠀⠀⠙⠿⢿⣿⣿⠿⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠄⠀⠀⢐⠄⡀⠑⠂⢑⡈⡗⡄⠁⣪⠘⠊⠱⡝⢀⣍⠎⡽⠋⠕⡄⠿⡃⡇⡧⣫⣻⣴⡿⣻⣽⣟⣞⣧⣻⢟⣿⢾⡿⣷⢿⡏⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⡿⣿⣿⣿⣿⣿⠿⣫⣿⣳⠣⡻⢾⣻⡻⡫⡪⣏⡶⢘⣻⡉⠖⠜⢓⡡⡡⠐⡎⢨⣩⡠⢂⠐⠄⠙⡀⠀⠄⢀⠁⠡⠡⡀⡁
 
-Small project to learn some image processing with cython + OpenCV
+⠀⠀⠀⠀⠀⠀⣶⣶⣶⣶⣶⣶⣶⣤⡀  
+⠀⠀⠀⠀⠀⠀⣿⣿⡇⠀⠀⠈⠹⣿⣷⡀⠀⠀⢀⣠⣤⣄⣀⠀⠀⠀⣀⣀⢀⣠⣤⣄⡀⢀⣠⣤⣀⠀⠀⠀⠀⣀⣠⣤⣤⣀
+⠀⠀⠀⠀⠀⠀⣿⣿⡇⠀⠀⠀⠀⢻⣿⡇⠀⣴⣿⠟⠋⠛⣿⣷⡀⠀⣿⣿⡟⠛⠻⣿⣿⠟⠛⢻⣿⣧⠀⠀⣾⣿⠟⠛⠛⣿⣷⡄
+⠀⠀⠀⠀⠀⠀⣿⣿⡇⠀⠀⠀⠀⣾⣿⡇⠀⣿⣿⣶⣶⣶⣾⣿⡇⠀⣿⣿⠀⠀⠀⣿⣿⠀⠀⠀⣿⣿⠀⢸⣿⡏⠀⠀⠀⢸⣿⡇
+⠀⠀⠀⠀⠀⠀⣿⣿⣇⣀⣀⣀⣴⣿⡿⠀⠀⣿⣿⡀⠀⠀⣀⣀⠀⠀⣿⣿⠀⠀⠀⣿⣿⠀⠀⠀⣿⣿⠀⠸⣿⣷⡀⠀⠀⣼⣿⡇
+⠀⠀⠀⠀⠀⠀⠿⠿⠿⠿⠿⠿⠿⠋⠀⠀⠀⠘⠻⢿⣶⣿⠿⠋⠀⠀⠿⠿⠀⠀⠀⠿⠿⠀⠀⠀⠿⠿⠀⠀⠙⠿⢿⣿⣿⠿⠋
+⠀⠀⠄⡀⠑⢑⡈⡗⡄⠁⣪⠊⠱⡝⢀⣍⠎⠋⠕⡄⠿⡃⡧⣫⣻⣴⡿⣻⣽⣟⣞⣧⣻⢟⣿⢾⡿⣷⢿⡏⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+
+Learning project that involced Numpy, cython and numba. 
+
+Goal was to create braille unicode representation of an image, where each braille dot represents one pixel in the image.
 
 ---
 **Setup:**
 
 ```bash
-git clone https://github.com/Kemaleen/ImgToBraille
-cd ImgToBraille
+git clone https://github.com/tomp2/imgtobraille
+cd imgtobraille
 python -m venv env
-source env/bin/activate
+source ./env/bin/activate
 pip install -r requirements.txt
 ```
-_Exit virtualenv with:_
+Exit virtualenv with:
 ```
 deactivate
 ```
@@ -44,6 +47,6 @@ optional arguments:
 Examples:
 
 ```
-python imgtobraille demos/demo.png -w 100
-python imgtobraille demos/cube/ -w 50 -t 0.05
+python imgtobraille ./demos/demo.png -w 100
+python imgtobraille ./demos/cube/ -w 50 -t 0.05
 ```
