@@ -14,7 +14,7 @@
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⠼⠤⠒⠈⠉
 ```
 
-Learning project that involced Numpy, cython and numba. 
+Learning project that involved Numpy, cython and numba. 
 
 Goal was to create braille unicode representation of an image, where each braille dot represents one pixel in the image.
 
