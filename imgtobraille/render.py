@@ -141,10 +141,10 @@ def render(
     tile: np.ndarray = BRAILLE_TILE,
 ) -> str:
     """
-    Create a braille unicode representation of a numpy array. Gray array will be
-    used to form the braille unicode characters. One pixel/value in gray_arr equals
+    Create a braille unicode representation of a numpy array. dot_arr will be
+    used to form the braille unicode characters. One pixel/value in dot_arr equals
     one dot in braille character. If color_arr is given, the output braille characters
-    will also be colored with ANSI codes and color_arr values.
+    will also be colored with ANSI escape codes.
     :param dot_arr: array that determines the on/off status of braille dots.
     :param color_arr: optional array that will be used to color the
     braille characters with ansi escape sequences.
