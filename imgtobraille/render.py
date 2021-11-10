@@ -151,8 +151,9 @@ def render(
     # Allow conversion for arrays smaller than braille tile
     arr_height, arr_width = dot_arr.shape
     if arr_height < 4 or arr_width < 2:
-        pad_right = 2 - arr_width
-        pad_bottom = 4 - arr_height
+        pad_right = max(2 - arr_width, 0)
+        pad_bottom = max(4 - arr_height, 0)
+
         dot_arr = np.pad(dot_arr, ((0, pad_bottom), (0, pad_right)))
         if color_arr is not None:
             color_arr = np.pad(
