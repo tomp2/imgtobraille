@@ -127,12 +127,6 @@ def _validate_render_arguments(
                 f"gray_arr.shape={dot_arr.shape} != {color_arr.shape}"
             )
 
-    height_arr, width_arr = dot_arr.shape
-    if height_arr < 4 or width_arr < 2:
-        raise ValueError(
-            "Height must be greater than 3 and width must be greater than 1."
-        )
-
 
 def render(
     dot_arr: np.ndarray,
@@ -154,7 +148,18 @@ def render(
     """
     _validate_render_arguments(dot_arr, color_arr)
 
+    # Allow conversion for arrays smaller than braille tile
     arr_height, arr_width = dot_arr.shape
+    if arr_height < 4 or arr_width < 2:
+        pad_right = 2 - arr_width
+        pad_bottom = 4 - arr_height
+        dot_arr = np.pad(dot_arr, ((0, pad_bottom), (0, pad_right)))
+        if color_arr is not None:
+            color_arr = np.pad(
+                color_arr, ((0, 0), (0, pad_bottom), (0, pad_right), (0, 0))
+            )
+    arr_height, arr_width = dot_arr.shape
+
     tile_height, tile_width = tile.shape
 
     # Braille tiles must fit over the array without leaving a remainder
