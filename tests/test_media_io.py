@@ -1,9 +1,8 @@
-from unittest import mock
-from unittest.mock import MagicMock
-
 import numpy as np
 import pytest
 from cv2 import cv2
+from unittest import mock
+from unittest.mock import MagicMock
 
 from imgtobraille import media_io
 
