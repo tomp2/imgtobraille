@@ -74,23 +74,23 @@ def test_VideoStream():
 def test_VideoFile_color():
     test_media_path = "./test_media/cube.mp4"
     stream = media_io.VideoFile(test_media_path, color=True)
-    print(stream.frame_count)
+    assert stream.current_frame == 0
+    assert len(list(stream)) == 99
+    assert stream.current_frame == 99
+    assert stream.frame_rate == 15
+    assert stream.frame_count == 99
+
+    stream.read_frame(50)
+    assert stream.current_frame == 51
+    stream.read_frame()
+    assert stream.current_frame == 52
+    stream.read_frame(53)
+    assert stream.current_frame == 54
+
+    frame = stream.read_frame()
+    assert frame.shape == (120, 120, 3)
+
     with pytest.raises(IndexError):
         stream.read_frame(-1)
     with pytest.raises(IndexError):
         stream.read_frame(100)
-
-    assert len(list(stream)) == 99
-
-    assert stream.frame_rate == 15
-    assert stream.frame_count == 99
-    assert stream.current_frame == 0
-    stream.read_frame(50)
-    assert stream.current_frame == 50
-    stream.read_frame()
-    assert stream.current_frame == 50
-    stream.read_frame(50)
-    assert stream.current_frame == 50
-
-    frame = stream.read_frame()
-    assert frame.shape == (120, 120, 3)
